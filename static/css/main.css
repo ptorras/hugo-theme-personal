@@ -362,6 +362,7 @@ pre code {
 }
 
 .sidenote-toggle { display: none; }
+.sidenote-checkbox { display: none; }
 
 .sidenote {
   float: right;
