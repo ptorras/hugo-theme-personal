@@ -1,7 +1,12 @@
 {{ define "main" }}
 <div class="list">
   {{ if .IsHome }}{{ partial "motif.html" . }}{{ end }}
-  {{ if not .IsHome }}<h1 class="list-title">{{ .Title }}</h1>{{ end }}
+  {{ if not .IsHome }}
+  <header class="list-header">
+    {{ partial "motif.html" . }}
+    <h1 class="list-title">{{ .Title }}</h1>
+  </header>
+  {{ end }}
   {{ .Content }}
   <ul class="post-list">
     {{ range .Paginator.Pages }}

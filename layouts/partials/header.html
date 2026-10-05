@@ -1,6 +1,11 @@
 <header class="site-header">
-  <a class="site-title" href="{{ "/" | relLangURL }}">{{ .Site.Title }}</a>
-  {{ with .Site.Params.subtitle }}<p class="site-subtitle">{{ . }}</p>{{ end }}
+  <div class="site-brand">
+    {{ partial "brand-mark.html" . }}
+    <div>
+      <a class="site-title" href="{{ "/" | relLangURL }}">{{ .Site.Title }}</a>
+      {{ with .Site.Params.subtitle }}<p class="site-subtitle">{{ . }}</p>{{ end }}
+    </div>
+  </div>
   {{ with .Site.Menus.main }}
   <nav class="site-nav">
     <ul>
@@ -8,6 +13,7 @@
       <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
       {{ end }}
     </ul>
+    <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
   </nav>
   {{ end }}
 </header>
