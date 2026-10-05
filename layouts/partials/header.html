@@ -1,0 +1,13 @@
+<header class="site-header">
+  <a class="site-title" href="{{ "/" | relLangURL }}">{{ .Site.Title }}</a>
+  {{ with .Site.Params.subtitle }}<p class="site-subtitle">{{ . }}</p>{{ end }}
+  {{ with .Site.Menus.main }}
+  <nav class="site-nav">
+    <ul>
+      {{ range . }}
+      <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+      {{ end }}
+    </ul>
+  </nav>
+  {{ end }}
+</header>

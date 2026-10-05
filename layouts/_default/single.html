@@ -1,0 +1,22 @@
+{{ define "main" }}
+<article class="article">
+  <header class="article-header">
+    {{ partial "motif.html" . }}
+    <h1 class="article-title">{{ .Title }}</h1>
+    <p class="article-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (.Site.Params.dateFormat | default "2006-01-02") }}</time>
+      {{ if .Site.Params.showReadingTime }}<span class="meta-sep">&middot;</span> {{ .ReadingTime }} min read{{ end }}
+      {{ with .Params.tags }}
+      <span class="meta-sep">&middot;</span>
+      {{ range $i, $t := . }}{{ if $i }}, {{ end }}<a class="tag" href="{{ "/tags/" | relLangURL }}{{ $t | urlize }}">{{ $t }}</a>{{ end }}
+      {{ end }}
+    </p>
+  </header>
+
+  {{ partial "toc.html" . }}
+
+  <div class="article-content">
+    {{ .Content }}
+  </div>
+</article>
+{{ end }}

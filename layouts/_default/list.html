@@ -1,0 +1,17 @@
+{{ define "main" }}
+<div class="list">
+  {{ if .IsHome }}{{ partial "motif.html" . }}{{ end }}
+  {{ if not .IsHome }}<h1 class="list-title">{{ .Title }}</h1>{{ end }}
+  {{ .Content }}
+  <ul class="post-list">
+    {{ range .Paginator.Pages }}
+    <li class="post-list-item">
+      <a class="post-list-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+      <time class="post-list-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (.Site.Params.dateFormat | default "2006-01-02") }}</time>
+      {{ with .Plain }}<p class="post-list-summary">{{ . | htmlUnescape | truncate 200 }}</p>{{ end }}
+    </li>
+    {{ end }}
+  </ul>
+  {{ template "_internal/pagination.html" . }}
+</div>
+{{ end }}

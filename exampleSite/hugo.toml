@@ -1,0 +1,30 @@
+baseURL = "http://localhost:1313"
+title = "Example Site"
+theme = "personal"
+pagination.pagerSize = 5
+
+[params]
+  subtitle = "A test subtitle"
+  dateFormat = "2006-01-02"
+  showReadingTime = true
+  mainSection = "posts"
+  postsOnHomePage = 10
+
+[[menu.main]]
+  name = "About"
+  url = "/about"
+[[menu.main]]
+  name = "Blog"
+  url = "/posts"
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    style = "solarized-light"
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.typographer]
+        disable = false
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4

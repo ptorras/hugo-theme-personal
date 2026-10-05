@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode | default "en" }}">
+{{ partial "head.html" . }}
+<body>
+  <div class="page">
+    {{ partial "header.html" . }}
+    <main class="main">
+      {{ block "main" . }}{{ end }}
+    </main>
+    {{ partial "footer.html" . }}
+  </div>
+  <script src="{{ "js/sidenotes.js" | relURL }}" defer></script>
+</body>
+</html>

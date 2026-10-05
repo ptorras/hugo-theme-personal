@@ -1,0 +1,19 @@
+{{ define "main" }}
+<div class="home">
+  {{ partial "motif.html" . }}
+  {{ with .Content }}<div class="home-intro">{{ . }}</div>{{ end }}
+
+  {{ $mainSection := .Site.Params.mainSection | default "posts" }}
+  {{ with .Site.GetPage (printf "/%s" $mainSection) }}
+  <ul class="post-list">
+    {{ range (.Pages | first ($.Site.Params.postsOnHomePage | default 10)) }}
+    <li class="post-list-item">
+      <a class="post-list-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+      <time class="post-list-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format ($.Site.Params.dateFormat | default "2006-01-02") }}</time>
+      {{ with .Plain }}<p class="post-list-summary">{{ . | htmlUnescape | truncate 200 }}</p>{{ end }}
+    </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+</div>
+{{ end }}
