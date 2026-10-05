@@ -1,6 +1,7 @@
-{{ if and (ne .Params.toc false) .TableOfContents }}
+{{ $toc := .TableOfContents }}
+{{ if and (ne .Params.toc false) (in (string $toc) "<li") }}
 <nav class="toc" aria-label="Table of contents">
   <p class="toc-title">Contents</p>
-  {{ .TableOfContents }}
+  {{ $toc }}
 </nav>
 {{ end }}
