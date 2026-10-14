@@ -1,5 +1,5 @@
 name = "personal"
-license = "MIT"
+license = "GPL-3.0-or-later"
 licenselink = "LICENSE"
 description = "A quiet, readable personal blog theme: serif body text, grotesque headers, solarized-light code blocks, and Tufte-style side notes."
 homepage = "https://github.com/ptorras/hugo-theme-personal"
