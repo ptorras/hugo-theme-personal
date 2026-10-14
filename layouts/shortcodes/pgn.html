@@ -1,0 +1,39 @@
+{{- /*
+  Interactive game viewer (Lichess PGN Viewer), themed to match the site.
+
+    {{< pgn caption="Kasparov–Topalov, Wijk aan Zee 1999" >}}
+    [White "Kasparov, Garry"]
+    [Black "Topalov, Veselin"]
+    1. e4 d6 2. d4 Nf6 {A comment.} ...
+    {{< /pgn >}}
+
+    {{< pgn file="game.pgn" orientation="black" ply="24" moves="bottom" />}}
+
+  `file` is looked up in the page bundle. `ply` is the half-move to open on
+  (or "last"); `moves` is auto|right|bottom|false. Without JavaScript the raw
+  PGN is shown instead.
+*/ -}}
+{{- $pgn := "" -}}
+{{- with .Get "file" -}}
+  {{- with $.Page.Resources.Get . -}}
+    {{- $pgn = .Content -}}
+  {{- else -}}
+    {{- errorf "pgn: %q not found in the page bundle (%s)" . $.Position -}}
+  {{- end -}}
+{{- else -}}
+  {{- $pgn = .Inner -}}
+{{- end -}}
+{{- $pgn = trim $pgn "\n " -}}
+{{- if not $pgn -}}{{- errorf "pgn: no PGN given (%s)" .Position -}}{{- end -}}
+<figure class="chess-game">
+<div class="chess-game__viewer"
+  {{- with .Get "orientation" }} data-orientation="{{ . }}"{{ end }}
+  {{- with .Get "ply" }} data-ply="{{ . }}"{{ end }}
+  {{- with .Get "moves" }} data-moves="{{ . }}"{{ end }}>
+<pre class="chess-game__pgn">{{ $pgn }}</pre>
+</div>
+{{- with .Get "caption" }}
+<figcaption>{{ . | $.Page.RenderString }}</figcaption>
+{{- end }}
+</figure>
+<script type="module" src="{{ "chess/games.js" | relURL }}"></script>

@@ -1,0 +1,106 @@
+{{- /*
+  Static chess diagram from a FEN string, drawn as inline SVG at build time.
+
+    {{< fen "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1" >}}
+
+    {{< fen fen="..." caption="After 1. e4" orientation="black"
+            highlight="e4 d5" arrows="g1f3 f1c4" coords="false" >}}
+
+  Only the piece placement (first field of the FEN) is used.
+*/ -}}
+{{- $pos := .Position -}}
+{{- $fen := "" -}}
+{{- $caption := "" -}}
+{{- $flip := false -}}
+{{- $coords := true -}}
+{{- $highlight := "" -}}
+{{- $arrows := "" -}}
+{{- if .IsNamedParams -}}
+  {{- $fen = .Get "fen" -}}
+  {{- $caption = .Get "caption" -}}
+  {{- $flip = eq (.Get "orientation") "black" -}}
+  {{- $coords = ne (.Get "coords") "false" -}}
+  {{- $highlight = .Get "highlight" -}}
+  {{- $arrows = .Get "arrows" -}}
+{{- else -}}
+  {{- $fen = .Get 0 -}}
+{{- end -}}
+{{- if not $fen -}}{{- errorf "fen: missing FEN string (%s)" $pos -}}{{- end -}}
+
+{{- /* Piece placement -> list of {id, x, y} in board coordinates. */ -}}
+{{- $ranks := split (index (split (trim $fen " ") " ") 0) "/" -}}
+{{- if ne (len $ranks) 8 -}}{{- errorf "fen: %q does not have 8 ranks (%s)" $fen $pos -}}{{- end -}}
+{{- $pieces := slice -}}
+{{- range $r, $rank := $ranks -}}
+  {{- $f := 0 -}}
+  {{- range split $rank "" -}}
+    {{- if findRE `^[1-8]$` . -}}
+      {{- $f = add $f (int .) -}}
+    {{- else if findRE `^[pnbrqkPNBRQK]$` . -}}
+      {{- $id := cond (eq . (upper .)) (printf "w%s" .) (printf "b%s" (upper .)) -}}
+      {{- $x := cond $flip (sub 7 $f) $f -}}
+      {{- $y := cond $flip (sub 7 $r) $r -}}
+      {{- $pieces = $pieces | append (dict "id" $id "x" $x "y" $y) -}}
+      {{- $f = add $f 1 -}}
+    {{- else -}}
+      {{- errorf "fen: unexpected %q in %q (%s)" . $fen $pos -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if ne $f 8 -}}{{- errorf "fen: rank %q in %q is not 8 squares wide (%s)" $rank $fen $pos -}}{{- end -}}
+{{- end -}}
+
+{{- /* Square name ("e4") -> board coordinates, honouring orientation. */ -}}
+{{- $files := dict "a" 0 "b" 1 "c" 2 "d" 3 "e" 4 "f" 5 "g" 6 "h" 7 -}}
+{{- $square := dict -}}
+{{- range $name, $i := $files -}}
+  {{- range $rank := seq 1 8 -}}
+    {{- $x := cond $flip (sub 7 $i) $i -}}
+    {{- $y := cond $flip (sub $rank 1) (sub 8 $rank) -}}
+    {{- $square = merge $square (dict (printf "%s%d" $name $rank) (dict "x" $x "y" $y)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $marks := slice -}}
+{{- range split (replace $highlight "," " ") " " -}}
+  {{- if . -}}
+    {{- with index $square . -}}{{- $marks = $marks | append . -}}
+    {{- else -}}{{- errorf "fen: bad highlight square %q (%s)" . $pos -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $lines := slice -}}
+{{- range split (replace $arrows "," " ") " " -}}
+  {{- if . -}}
+    {{- $from := index $square (substr . 0 2) -}}
+    {{- $to := index $square (substr . 2 2) -}}
+    {{- if or (ne (len .) 4) (not $from) (not $to) -}}{{- errorf "fen: bad arrow %q, expected e.g. \"e2e4\" (%s)" . $pos -}}{{- end -}}
+    {{- $lines = $lines | append (dict "from" $from "to" $to) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $sprite := "chess/pieces.svg" | relURL -}}
+{{- $arrowId := printf "chess-arrow-%d" .Ordinal -}}
+<figure class="chess-diagram">
+<svg class="chess-board" viewBox="0 0 8 8" role="img" aria-label="Chess diagram: {{ $fen }}">
+<title>{{ $fen }}</title>
+<rect class="sq-light" width="8" height="8"/>
+{{- range $y := seq 0 7 }}{{ range $x := seq 0 7 }}{{ if modBool (add $x $y) 2 | not }}<rect class="sq-dark" x="{{ $x }}" y="{{ $y }}" width="1" height="1"/>{{ end }}{{ end }}{{ end }}
+{{- range $marks }}<rect class="sq-mark" x="{{ .x }}" y="{{ .y }}" width="1" height="1"/>{{ end }}
+{{- if $coords }}
+<g class="coords" font-size="0.24">
+{{- range $name, $i := $files }}{{ $x := cond $flip (sub 7 $i) $i }}<text x="{{ add $x 0.95 }}" y="7.94" text-anchor="end" class="{{ cond (modBool $x 2) "on-dark" "on-light" }}">{{ $name }}</text>{{ end }}
+{{- range $rank := seq 1 8 }}{{ $y := cond $flip (sub $rank 1) (sub 8 $rank) }}<text x="0.05" y="{{ add $y 0.25 }}" class="{{ cond (modBool $y 2) "on-light" "on-dark" }}">{{ $rank }}</text>{{ end }}
+</g>
+{{- end }}
+{{- range $pieces }}<use href="{{ $sprite }}#{{ .id }}" x="{{ .x }}" y="{{ .y }}" width="1" height="1"/>{{ end }}
+{{- with $lines }}
+<defs><marker id="{{ $arrowId }}" viewBox="0 0 4 4" refX="3.4" refY="2" markerWidth="3.2" markerHeight="3.2" orient="auto"><path class="arrow-head" d="M0 0L4 2L0 4z"/></marker></defs>
+<g class="arrows">
+{{- range . }}<line x1="{{ add .from.x 0.5 }}" y1="{{ add .from.y 0.5 }}" x2="{{ add .to.x 0.5 }}" y2="{{ add .to.y 0.5 }}" marker-end="url(#{{ $arrowId }})"/>{{ end }}
+</g>
+{{- end }}
+</svg>
+{{- with $caption }}
+<figcaption>{{ . | $.Page.RenderString }}</figcaption>
+{{- end }}
+</figure>

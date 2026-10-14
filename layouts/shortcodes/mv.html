@@ -1,0 +1,23 @@
+{{- /*
+  Inline chess move(s) with figurine notation: piece letters become small
+  piece icons that follow the text colour.
+
+    {{< mv "14...Rxe4!" >}}   {{< mv "15. Nf6+ gxf6 16. Qg4+" >}}
+*/ -}}
+{{- $names := dict "K" "king" "Q" "queen" "R" "rook" "B" "bishop" "N" "knight" -}}
+{{- $sprite := "chess/pieces.svg" | relURL -}}
+{{- $tokens := slice -}}
+{{- range split (trim (.Get 0) " ") " " -}}
+  {{- if . -}}
+    {{- $tok := "" -}}
+    {{- range $c := split . "" -}}
+      {{- with index $names $c -}}
+        {{- $tok = printf "%s<svg class=\"figurine\" viewBox=\"0 0 45 45\" role=\"img\" aria-label=\"%s\"><use href=\"%s#w%s\"/></svg>" $tok . $sprite $c -}}
+      {{- else -}}
+        {{- $tok = printf "%s%s" $tok (htmlEscape $c) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $tokens = $tokens | append (printf "<span>%s</span>" $tok) -}}
+  {{- end -}}
+{{- end -}}
+<span class="san">{{ delimit $tokens " " | safeHTML }}</span>{{- /* no trailing newline */ -}}
