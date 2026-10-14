@@ -82,7 +82,6 @@
 {{- $arrowId := printf "chess-arrow-%d" .Ordinal -}}
 <figure class="chess-diagram">
 <svg class="chess-board" viewBox="0 0 8 8" role="img" aria-label="Chess diagram: {{ $fen }}">
-<title>{{ $fen }}</title>
 <rect class="sq-light" width="8" height="8"/>
 {{- range $y := seq 0 7 }}{{ range $x := seq 0 7 }}{{ if modBool (add $x $y) 2 | not }}<rect class="sq-dark" x="{{ $x }}" y="{{ $y }}" width="1" height="1"/>{{ end }}{{ end }}{{ end }}
 {{- range $marks }}<rect class="sq-mark" x="{{ .x }}" y="{{ .y }}" width="1" height="1"/>{{ end }}

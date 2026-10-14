@@ -12,7 +12,7 @@
     {{- $tok := "" -}}
     {{- range $c := split . "" -}}
       {{- with index $names $c -}}
-        {{- $tok = printf "%s<svg class=\"figurine\" viewBox=\"0 0 45 45\" role=\"img\" aria-label=\"%s\"><use href=\"%s#w%s\"/></svg>" $tok . $sprite $c -}}
+        {{- $tok = printf "%s<span class=\"san-letter\">%s</span><svg class=\"figurine\" viewBox=\"0 0 45 45\" aria-hidden=\"true\"><use href=\"%s#w%s\"/></svg>" $tok $c $sprite $c -}}
       {{- else -}}
         {{- $tok = printf "%s%s" $tok (htmlEscape $c) -}}
       {{- end -}}

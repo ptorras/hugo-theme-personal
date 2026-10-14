@@ -1,0 +1,4 @@
+{{- /* Plain-text summary for post lists. Chess diagrams and game viewers are
+       dropped first: their coordinates, captions and PGN read as noise. */ -}}
+{{- $text := .Content | replaceRE `(?s)<figure class="chess-.*?</figure>` "" | plainify | htmlUnescape | strings.TrimSpace -}}
+{{- with $text }}<p class="post-list-summary">{{ . | truncate 200 }}</p>{{ end -}}
